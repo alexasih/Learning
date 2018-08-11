@@ -8,5 +8,5 @@ class Alert(object):
         self.item = item
 
     def __repr__(self):
-        return "<Alert for {} on item {} with price P{>".format(self.user.email, self.item.name, self.price_limit)
+        return "<Alert for {} on item {} with price {}>".format(self.user.email, self.item.name, self.price_limit)
 
