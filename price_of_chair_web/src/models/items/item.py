@@ -2,12 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+from src.common.database import Database
+import src.models.items.constants as ItemConstants
 
 __author__ = 'alexasih'
 
 
 class Item(object):
-    def __init__(self, name, price, url, store):
+    def __init__(self, name, url, store):
         self.name = name
         self.url = url
         self.store = store
@@ -31,5 +33,15 @@ class Item(object):
 
         return match.group()
 
+    def save_to_mongo(self):
+        # Insert JSON representation
+        Database.insert(ItemConstants.COLLECTION, self.json())
 
+    def json(self):
+        return {
+            "name": self.name,
+            "url": self.url
+        }
+
+    # post to mongo db
 
