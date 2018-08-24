@@ -55,4 +55,4 @@ class Alert(object):
 
     @classmethod
     def get_by_id(cls, item_id):
-        return cls(**Database.find_one(ItemConstants.COLLECTION, {"_id": item_id})
+        return cls(**Database.find_one(ItemConstants.COLLECTION, {"_id": item_id}))

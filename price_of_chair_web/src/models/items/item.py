@@ -1,3 +1,4 @@
+import datetime
 import uuid
 import requests
 from bs4 import BeautifulSoup
@@ -46,4 +47,14 @@ class Item(object):
             "name": self.name,
             "url": self.url
         }
+
+    def load_item_price(self):
+        self.item.load_price()
+        self.last_checked = datetime.datetime.utcnow()
+        self.save_to_mongo()
+        return self.item.price
+
+    def send_email_if_price_reached(self):
+        if self.item.price < self.price_limit:
+            self.send()
 
