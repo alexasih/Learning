@@ -5,15 +5,16 @@ import re
 
 from src.common.database import Database
 import src.models.items.constants as ItemConstants
+from src.models.stores.store import Store
 
 __author__ = 'alexasih'
 
 
 class Item(object):
-    def __init__(self, name, url, store, _id=None):
+    def __init__(self, name, url, _id=None):
         self.name = name
         self.url = url
-        self.store = store
+        store = Store.find_by_url(url)
         tag_name = store.tag_name
         query = store.query
         self.price = self.load_price(tag_name, query)
@@ -36,7 +37,6 @@ class Item(object):
         return match.group()
 
     def save_to_mongo(self):
-        # Insert JSON representation
         Database.insert(ItemConstants.COLLECTION, self.json())
 
     def json(self):
@@ -45,6 +45,4 @@ class Item(object):
             "name": self.name,
             "url": self.url
         }
-
-    # post to mongo db
 
