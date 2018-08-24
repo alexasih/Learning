@@ -25,7 +25,6 @@ class Item(object):
         return "<Item {} with URL {}>".format(self.name, self.url)
 
     def load_price(self):
-        # Amazon: <span id="priceblock_ourprice" class="a-size-medium a-color-price">$3,099.00</span>
         request = requests.get(self.url)
         content = request.content
         soup = BeautifulSoup(content, "html.parser")
@@ -34,9 +33,9 @@ class Item(object):
 
         pattern = re.compile("(\d+.\d+)")
         match = pattern.search(string_price)
-        self.price = match.group()
+        self.price = float(match.group())
 
-        return match.group()
+        return self.price
 
     def save_to_mongo(self):
         Database.insert(ItemConstants.COLLECTION, self.json())
@@ -48,13 +47,8 @@ class Item(object):
             "url": self.url
         }
 
-    def load_item_price(self):
-        self.item.load_price()
-        self.last_checked = datetime.datetime.utcnow()
-        self.save_to_mongo()
-        return self.item.price
+    @classmethod
+    def get_by_id(cls, item_id):
+        return cls(**Database.find_one(ItemConstants.COLLECTION, {"_id": item_id}))
 
-    def send_email_if_price_reached(self):
-        if self.item.price < self.price_limit:
-            self.send()
 

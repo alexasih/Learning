@@ -5,7 +5,6 @@ import requests
 import src.models.alerts.constants as AlertConstants
 from src.common.database import Database
 from src.models.items.item import Item
-import src.models.items.constants as ItemConstants
 
 __author__ = 'alexasih'
 
@@ -38,11 +37,11 @@ class Alert(object):
         last_updated_limit = datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes_since_update)
         return [cls(**elem) for elem in Database.find(AlertConstants.COLLECTION,
                                                       {"last_checked":
-                                                           {"$gte": last_updated_limit}
+                                                           {"$lte": last_updated_limit}
                                                        })]
 
     def save_to_mongo(self):
-        Database.insert(AlertConstants.COLLECTION, self.json())
+        Database.insert(AlertConstants.COLLECTION, {"_id": self._id}, self.json())
 
     def json(self):
         return {
@@ -53,6 +52,12 @@ class Alert(object):
             "item_id": self.item._id
         }
 
-    @classmethod
-    def get_by_id(cls, item_id):
-        return cls(**Database.find_one(ItemConstants.COLLECTION, {"_id": item_id}))
+    def load_item_price(self):
+        self.item.load_price()
+        self.last_checked = datetime.datetime.utcnow()
+        self.save_to_mongo()
+        return self.item.price
+
+    def send_email_if_price_reached(self):
+        if self.item.price < self.price_limit:
+            self.send()
