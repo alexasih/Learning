@@ -23,7 +23,7 @@ def login_user():
         except UserErrors.UserError as e:
             return e.message
 
-    return render_template("users/login.html")
+    return render_template("users/login.jinja2")
 
 
 @user_blueprint.route('/register', methods=['GET', 'POST'])
@@ -39,7 +39,7 @@ def register_user():
         except UserErrors.UserError as e:
             return e.message
 
-    return render_template("users/register.html")
+    return render_template("users/register.jinja2")
 
 
 @user_blueprint.route('/alerts')
