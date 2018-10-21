@@ -10,12 +10,13 @@ __author__ = 'alexasih'
 
 
 class Alert(object):
-    def __init__(self, user_email, price_limit, item_id, last_checked=None, _id=None):
+    def __init__(self, user_email, price_limit, item_id, active=True, last_checked=None, _id=None):
         self.user_email = user_email
         self.price_limit = price_limit
         self.item = Item.get_by_id(item_id)
         self.last_checked = datetime.datetime.utcnow() if last_checked is None else last_checked
         self._id = uuid.uuid4().hex if _id is None else _id
+        self.active = active
 
     def __repr__(self):
         return "<Alert for {} on item {} with price {}>".format(self.user_email, self.item.name, self.price_limit)
@@ -49,7 +50,8 @@ class Alert(object):
             "price_limit": self.price_limit,
             "last_checked": self.last_checked,
             "user_email": self.user_email,
-            "item_id": self.item._id
+            "item_id": self.item._id,
+            "active": self.active
         }
 
     def load_item_price(self):
@@ -71,3 +73,10 @@ class Alert(object):
     def find_by_id(cls, alert_id):
         return cls(**Database.find_one(AlertConstants.COLLECTION, {'_id': alert_id}))
 
+    def deactivate(self):
+        self.active = False
+        self.save_to_mongo()
+
+    def activate(self):
+        self.active = True
+        self.save_to_mongo()
