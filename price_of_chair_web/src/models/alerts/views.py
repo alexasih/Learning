@@ -21,7 +21,7 @@ def create_alert():
     if request.method == 'POST':
         name = request.form['name']
         url = request.form['url']
-        price_limit = request.form['price_limit']
+        price_limit = float(request.form['price_limit'])
 
         item = Item(name, url)
         item.save_to_mongo()
@@ -37,6 +37,20 @@ def create_alert():
 @user_decorators.require_login
 def deactivate_alert(alert_id):
     Alert.find_by_id(alert_id).deactivate()
+    return redirect(url_for('users.user_alerts'))
+
+
+@alert_blueprint.route('/delete/<string:alert_id>')
+@user_decorators.require_login
+def delete_alert(alert_id):
+    Alert.find_by_id(alert_id).delete()
+    return redirect(url_for('users.user_alerts'))
+
+
+@alert_blueprint.route('/activate/<string:alert_id>')
+@user_decorators.require_login
+def activate_alert(alert_id):
+    Alert.find_by_id(alert_id).activate()
     return redirect(url_for('users.user_alerts'))
 
 
