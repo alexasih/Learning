@@ -14,8 +14,9 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     let baseURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/BTC"
     let currencyArray = ["AUD", "BRL","CAD","CNY","EUR","GBP","HKD","IDR","ILS","INR","JPY","MXN","NOK","NZD","PLN","RON","RUB","SEK","SGD","USD","ZAR"]
-    let currencySymbols = ["$", "R$", "$", "¥", "€", "£", "$", "Rp", "₪", "₹", "¥", "$", "kr", "$", "zł", "lei", "₽", "kr", "$", "$", "R"]
+    let currencySymbolArray = ["$", "R$", "$", "¥", "€", "£", "$", "Rp", "₪", "₹", "¥", "$", "kr", "$", "zł", "lei", "₽", "kr", "$", "$", "R"]
     var finalURL = ""
+    var currencySelected = ""
 
     //Pre-setup IBOutlets
     @IBOutlet weak var bitcoinPriceLabel: UILabel!
@@ -50,6 +51,8 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         
         finalURL = baseURL + currencyArray[row]
         print(finalURL)
+        currencySelected = currencySymbolArray[row]
+        getBitcoinData(url: finalURL)
     }
     
     
@@ -63,7 +66,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
             .responseJSON { response in
                 if response.result.isSuccess {
 
-                    print("Sucess! Got the bitcoin data")
+                    print("Sucess! Got the Bitcoin data")
                     let bitcoinJSON : JSON = JSON(response.result.value!)
 
                     self.updateBitcoinData(json: bitcoinJSON)
@@ -85,12 +88,11 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     
     func updateBitcoinData(json : JSON) {
         
-        if let priceResult = json["main"]["averages"]["day"].double {
-            bitcoinPriceLabel.text = "\(priceResult)"
+        if let bitcoinResult = json["ask"].double {
+            bitcoinPriceLabel.text = currencySelected + String(bitcoinResult)
         }
-        
         else {
-            bitcoinPriceLabel.text = "Currency Unavailable"
+            bitcoinPriceLabel.text = "Price Unavailable"
         }
     }
 
